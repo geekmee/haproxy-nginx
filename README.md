@@ -45,3 +45,4 @@ http://192.168.1.102:8080/stats
 
 
 Ref: https://www.howtoforge.com/tutorial/how-to-setup-haproxy-as-load-balancer-for-nginx-on-centos-7/
+Ref: CentOS Vagrant Box https://app.vagrantup.com/centos/boxes/7
