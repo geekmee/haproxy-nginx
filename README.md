@@ -10,6 +10,7 @@ vi /etc/hosts
 192.168.10.104 nginx1
 192.168.10.105 nginx2
 yum -y install haproxy
+cd /etc/haproxy
 vi haproxy.cfg #copy/paste haproxy-nginx/haproxy.cfg
 vi /etc/rsyslog.conf #uncomment
 $ModLoad imudp
@@ -29,6 +30,7 @@ vi /etc/hosts
 192.168.10.104 nginx1
 192.168.10.105 nginx2
 192.168.10.102 master
+yum -y install epel-release
 yum -y install nginx
 cd /usr/share/nginx/html/
 echo "<h1>echo from nginx1</h1>" > index.html 
