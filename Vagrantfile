@@ -31,21 +31,42 @@ Vagrant.configure("2") do |config|
      systemctl enable haproxy
     SHELL
   end
-  config.vm.define :nginx1  do |nginx1|
+
+config.vm.define :nginx1  do |nginx1|
     nginx1.vm.provider "virtualbox" do |v|
-          v.customize ["modifyvm", :id, "--name", "nginx1", "--memory", "1024"]
+        v.memory = "512"
     end
     nginx1.vm.box = "centos/7"
     nginx1.vm.hostname = "nginx1"
     nginx1.vm.network :private_network, ip: "192.168.10.104"
+    nginx1.vm.provision "shell", inline: <<-SHELL
+    echo "192.168.10.104 nginx1
+    192.168.10.105 nginx2
+    192.168.10.102 master" >> /etc/hosts
+    yum install -y epel-release
+    yum install -y nginx
+    echo "<h1>echo from nginx1</h1>" > /usr/share/nginx/html/index.html
+    systemctl start nginx
+    systemctl enable nginx
+   SHELL
   end
   config.vm.define :nginx2  do |nginx2|
     nginx2.vm.provider "virtualbox" do |v|
-          v.customize ["modifyvm", :id, "--name", "nginx2", "--memory", "1024"]
+        v.memory = "512"
     end
     nginx2.vm.box = "centos/7"
     nginx2.vm.hostname = "nginx2"
     nginx2.vm.network :private_network, ip: "192.168.10.105"
+    nginx2.vm.provision "shell", inline: <<-SHELL
+    echo "192.168.10.104 nginx1
+    192.168.10.105 nginx2
+    192.168.10.102 master" >> /etc/hosts
+    yum install -y epel-release
+    yum install -y nginx
+    echo "<h1>echo from nginx2</h1>" > /usr/share/nginx/html/index.html
+    systemctl start nginx
+    systemctl enable nginx
+   SHELL
   end
 
 
