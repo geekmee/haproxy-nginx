@@ -3,24 +3,49 @@ To demo how HAProxy works with Nginx
 
 
 
-## On master, install and configure up haproxy
+## On master
+configure hosts
 ```vagrant ssh master
 sudo su
 
 vi /etc/hosts
 - 192.168.10.104 nginx1
 - 192.168.10.105 nginx2
+```
 
+install and configure haproxy 
+```
 yum -y install haproxy
-cd /etc/haproxy
-vi haproxy.cfg #copy/paste haproxy-nginx/haproxy.cfg
-vi /etc/rsyslog.conf #uncomment
- - $ModLoad imudp
- - $UDPServerRun 514
+
+vi /etc/haproxy/haproxy.cfg (we can just copy/paste haproxy-nginx/haproxy.cfg)
+backend app-main
+    balance roundrobin                                     #Balance algorithm
+    option httpchk HEAD / HTTP/1.1\r\nHost:\ localhost    #Check the server application is up and healty - 200 status code
+    server nginx1 192.168.10.104:80 check                 #Nginx1
+    server nginx2 192.168.10.105:80 check                 #Nginx2
+```
+
+configure rsyslog for HAProxy. We will configure the rsyslog daemon to log the HAProxy statistics. Edit the rsyslog.conf file to enable the UDP port 514 to be used by rsyslog.
+```
+vi /etc/rsyslog.conf (uncoment following lines)
+ $ModLoad imudp
+ $UDPServerRun 514
+```
+If you want to use a specific IP, you can add a new line like the one below:
+
+```
+$UDPServerAddress 127.0.0.1
+```
+
+Then create new haproxy configuration file for rsyslog.
+```
 vi /etc/rsyslog.d/haproxy.conf #adding
 local2.=info     /var/log/haproxy-access.log    #For Access Log
 local2.notice    /var/log/haproxy-info.log      #For Service Info - Backend, loadbalancer
+```
 
+start haproxy
+```
 systemctl restart rsyslog
 systemctl start haproxy
 systemctl enable haproxy
@@ -34,11 +59,13 @@ vi /etc/hosts
 - 192.168.10.104 nginx1
 - 192.168.10.105 nginx2
 - 192.168.10.102 master
+
 yum -y install epel-release
 yum -y install nginx
-cd /usr/share/nginx/html/
-echo "<h1>echo from nginx1</h1>" > index.html 
-echo "<h1>echo from nginx2</h1>" > index.html (for nginx2)
+
+echo "<h1>echo from nginx1</h1>" > /usr/share/nginx/html/index.html 
+echo "<h1>echo from nginx2</h1>" > /usr/share/nginx/html/index.html (for nginx2)
+
 systemctl enable nginx
 systemctl start nginx
 ```
@@ -47,7 +74,7 @@ systemctl start nginx
 curl 192.168.10.102
 
 ## statistics
-http://192.168.1.102:8080/stats
+http://192.168.10.102:8080/stats
 
 ## Ref
 - https://www.howtoforge.com/tutorial/how-to-setup-haproxy-as-load-balancer-for-nginx-on-centos-7/
