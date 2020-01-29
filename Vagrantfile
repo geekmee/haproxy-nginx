@@ -32,7 +32,6 @@ Vagrant.configure("2") do |config|
      yum install -y java
      curl -O http://mirrors.tuna.tsinghua.edu.cn/apache//jmeter/binaries/apache-jmeter-5.2.1.tgz
      tar -zvxf apache-jmeter-5.2.1.tgz
-     cp haproxy-nginx/load-test.jmx apache-jmeter-5.2.1
     SHELL
   end
 
