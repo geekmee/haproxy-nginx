@@ -93,6 +93,11 @@ systemctl start nginx
 ## test
 curl 192.168.10.102
 
+load test using JMeter
+vagrant ssh master
+./load-test.sh
+
+
 ## statistics
 HAProxy web monitoring (username/password: admin/admin, set in file /etc/haproxy/haproxy.cfg)
 http://192.168.10.102:8080/stats
