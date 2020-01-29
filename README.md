@@ -9,8 +9,8 @@ configure hosts
 sudo su
 
 vi /etc/hosts
-- 192.168.10.104 nginx1
-- 192.168.10.105 nginx2
+  192.168.10.104 nginx1
+  192.168.10.105 nginx2
 ```
 
 install and configure haproxy 
@@ -56,9 +56,9 @@ systemctl enable haproxy
 vagrant ssh nginx1
 sudo su
 vi /etc/hosts
-- 192.168.10.104 nginx1
-- 192.168.10.105 nginx2
-- 192.168.10.102 master
+  192.168.10.104 nginx1
+  192.168.10.105 nginx2
+  192.168.10.102 master
 
 yum -y install epel-release
 yum -y install nginx
