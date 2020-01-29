@@ -14,10 +14,30 @@ vi /etc/hosts
 ```
 
 install and configure haproxy 
-```
-yum -y install haproxy
+`yum -y install haproxy`
 
 vi /etc/haproxy/haproxy.cfg (we can just copy/paste haproxy-nginx/haproxy.cfg)
+
+```
+listen haproxy3-monitoring *:8080                #Haproxy Monitoring run on port 8080
+    mode http
+    option forwardfor
+    option httpclose
+    stats enable
+    stats show-legends
+    stats refresh 5s
+    stats uri /stats                             #URL for HAProxy monitoring
+    stats realm Haproxy\ Statistics
+    stats auth admin:admin            #User and Password for login to the monitoring dashboard
+    stats admin if TRUE
+    default_backend app-main                    #This is optionally for monitoring backend
+    
+frontend main
+    bind *:80
+    option http-server-close
+    option forwardfor
+    default_backend app-main
+ 
 backend app-main
     balance roundrobin                                     #Balance algorithm
     option httpchk HEAD / HTTP/1.1\r\nHost:\ localhost    #Check the server application is up and healty - 200 status code
@@ -74,6 +94,7 @@ systemctl start nginx
 curl 192.168.10.102
 
 ## statistics
+HAProxy web monitoring (username/password: admin/admin, set in file /etc/haproxy/haproxy.cfg)
 http://192.168.10.102:8080/stats
 
 ## Ref
