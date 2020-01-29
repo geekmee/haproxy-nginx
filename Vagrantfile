@@ -8,14 +8,29 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define :master do |master|
-    master.vm.provider "virtualbox" do |v|
-          v.customize ["modifyvm", :id, "--name", "master", "--memory", "2048"]
-    end
     master.vm.box = "centos/7"
+    master.vm.provider "virtualbox" do |v|
+       #v.customize ["modifyvm", :id, "--name", "master", "--memory", "2048"]
+        v.memory = "1024"
+    end
     master.vm.hostname = "master"
     master.vm.network :private_network, ip: "192.168.10.102"
+    master.vm.provision "shell", inline: <<-SHELL
+     yum -y install haproxy
+     echo "192.168.10.104 nginx1
+     192.168.10.105 nginx2" >> /etc/hosts
+     yum install -y git
+     git clone https://github.com/geekmee/haproxy-nginx.git
+     cp -f haproxy-nginx/haproxy.cfg /etc/haproxy/
+     echo "$ModLoad imudp
+     $UDPServerRun 514" >> /etc/rsyslog.conf
+     echo "local2.=info     /var/log/haproxy-access.log
+     local2.notice    /var/log/haproxy-info.log" > /etc/rsyslog.d/haproxy.conf
+     systemctl restart rsyslog
+     systemctl start haproxy
+     systemctl enable haproxy
+    SHELL
   end
-
   config.vm.define :nginx1  do |nginx1|
     nginx1.vm.provider "virtualbox" do |v|
           v.customize ["modifyvm", :id, "--name", "nginx1", "--memory", "1024"]
